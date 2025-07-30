@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Learning Tree",
-  description: "Learn English with the best resources and teachers",
+  title: "NEXUS LMS",
+  description: "Learn with the best resources and teachers",
   
 };
 
