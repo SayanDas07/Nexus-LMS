@@ -689,7 +689,7 @@ export default function AssignmentDetailPage() {
                 <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 drop-shadow-lg" />
                 <div className="text-left">
                   <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-100 to-blue-200 bg-clip-text text-transparent">
-                    The Learning Tree
+                    Nexus LMS
                   </h1>
                   <p className="text-xs text-slate-400 hidden sm:block font-medium">Teacher Dashboard</p>
                 </div>
@@ -722,7 +722,7 @@ export default function AssignmentDetailPage() {
                 <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 drop-shadow-lg" />
                 <div className="text-left">
                   <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-100 to-blue-200 bg-clip-text text-transparent">
-                    The Learning Tree
+                    Nexus LMS
                   </h1>
                   <p className="text-xs text-slate-400 hidden sm:block font-medium">Teacher Dashboard</p>
                 </div>
@@ -754,7 +754,7 @@ export default function AssignmentDetailPage() {
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400 drop-shadow-lg" />
               <div className="text-left">
                 <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-100 to-blue-200 bg-clip-text text-transparent">
-                  The Learning Tree
+                  Nexus LMS
                 </h1>
 
               </div>

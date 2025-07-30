@@ -27,7 +27,7 @@ export default function ChooseRole() {
             <div className="flex items-center gap-3">
               <BookOpen className="w-8 h-8 text-blue-400" />
               <div>
-                <h1 className="text-xl font-bold text-slate-100">The Learning Tree</h1>
+                <h1 className="text-xl font-bold text-slate-100">Nexus LMS</h1>
               </div>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function ChooseRole() {
           <div className="relative z-10 pt-5 sm:pb-6">
         <div className="text-center px-3 sm:px-4">
           <p className="text-xs sm:text-sm text-gray-500">
-            © 2025 The Learning Tree. All rights reserved.
+            © 2025 Nexus LMS. All rights reserved.
           </p>
         </div>
       </div>

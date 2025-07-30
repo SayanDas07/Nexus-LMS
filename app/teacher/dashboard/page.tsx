@@ -766,7 +766,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative">
         <ProfessionalAnimatedBackground />
-        <LoadingSpinner message="Loading The Learning Tree Dashboard" />
+        <LoadingSpinner message="Loading Nexus LMS Dashboard" />
       </div>
     )
   }
@@ -816,7 +816,7 @@ export default function Dashboard() {
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               <div className="flex flex-col">
                 <h1 className="text-base sm:text-l font-bold text-slate-100 leading-tight break-words sm:truncate">
-                  The Learning Tree
+                  Nexus LMS
                 </h1>
 
                 <p className="text-[10px] sm:text-xs text-slate-400">Teacher Dashboard</p>
