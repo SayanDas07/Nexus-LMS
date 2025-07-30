@@ -208,7 +208,7 @@ export default function CompleteRegistration() {
               <TreePine className="h-8 w-8 sm:h-10 sm:w-10 text-emerald-600" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Authentication Required</h2>
-            <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">Please sign in to join The Learning Tree</p>
+            <p className="text-gray-600 mb-6 sm:mb-8 text-sm sm:text-base">Please sign in to join Nexus LMS</p>
             <Link href="/sign-in">
               <button className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-6 py-3 rounded-lg shadow-lg hover:from-emerald-700 hover:to-teal-700 transition-all font-medium text-sm sm:text-base">
                 Sign In to Continue
@@ -254,7 +254,7 @@ export default function CompleteRegistration() {
             </div>
             <div>
               <span className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">
-                The Learning Tree
+                Nexus LMS
               </span>
               <p className="text-xs sm:text-sm text-gray-500 font-medium">English Learning Platform</p>
             </div>
@@ -300,7 +300,7 @@ export default function CompleteRegistration() {
 
           {/* Header */}
           <div className="mb-8 sm:mb-16 text-center">
-            <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-3">Join The Learning Tree</h1>
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-3">Join Nexus LMS</h1>
             <div className="h-1 w-20 sm:w-32 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto rounded-full"></div>
             <p className="text-gray-600 mt-4 sm:mt-6 text-sm sm:text-lg px-4 max-w-2xl mx-auto">
               Complete your student profile to unlock personalized English learning resources

@@ -520,7 +520,7 @@ export default function SignInPage() {
               </div>
               <div className="flex flex-col">
                 <span className="text-lg sm:text-xl font-bold text-gray-800 group-hover:text-emerald-600 transition-colors duration-300">
-                  The Learning Tree
+                  Nexus LMS
                 </span>
                
               </div>
@@ -616,7 +616,7 @@ export default function SignInPage() {
       <div className="relative z-10 pb-4 sm:pb-6">
         <div className="text-center px-3 sm:px-4">
           <p className="text-xs sm:text-sm text-gray-500">
-            © 2025 The Learning Tree. All rights reserved.
+            © 2025 Nexus LMS. All rights reserved.
           </p>
         </div>
       </div>

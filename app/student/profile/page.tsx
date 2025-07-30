@@ -613,7 +613,7 @@ const StudentProfilePage: React.FC = () => {
             <div className="flex items-center gap-2 sm:gap-3">
               <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
               <div>
-                <h1 className="text-lg sm:text-xl font-bold text-slate-100">The Learning Tree</h1>
+                <h1 className="text-lg sm:text-xl font-bold text-slate-100">Nexus LMS</h1>
                 <p className="text-xs text-slate-400 hidden sm:block">Student Profile</p>
               </div>
             </div>
