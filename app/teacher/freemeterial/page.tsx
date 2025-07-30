@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, BookOpen, Edit2, FileText, HelpCircle, Plus, Save, Trash2, X } from 'lucide-react';
+import { ArrowLeft, BookMarked, BookOpen, Brain, Edit2, FileText, GraduationCap, HelpCircle, ListOrdered, Loader2, Plus, Save, Sparkles, Trash2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { toast, Toaster } from 'sonner';
@@ -472,6 +472,19 @@ export default function FreeMaterialsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
 
+  // AI Generation Modal State
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiForm, setAiForm] = useState({
+    subject: '',
+    topic: '',
+    subTopic: '',
+    className: '',
+    numberOfQuestions: 5,
+    difficulty: 'medium' as 'easy' | 'medium' | 'hard',
+    questionType: 'mixed' as 'factual' | 'conceptual' | 'analytical' | 'mixed'
+  });
+
   const router = useRouter();
 
   const [form, setForm] = useState<CreateMaterialForm>({
@@ -499,6 +512,70 @@ export default function FreeMaterialsPage() {
       toast.error('Failed to fetch materials');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAIGeneration = async () => {
+    setAiGenerating(true);
+    
+    try {
+      const response = await fetch('/api/generate-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(aiForm)
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Create materials from generated questions
+        const createdMaterials = [];
+        for (const question of data.questions) {
+          const payload = {
+            question: question.question,
+            optionA: question.optionA,
+            optionB: question.optionB,
+            optionC: question.optionC,
+            optionD: question.optionD,
+            correctAns: question.correctOption,
+            explanation: question.explanation || '',
+            topic: aiForm.topic
+          };
+
+          const createResponse = await fetch('/api/freematerial', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (createResponse.ok) {
+            createdMaterials.push(payload);
+          }
+        }
+
+        setShowAIModal(false);
+        // Reset AI form
+        setAiForm({
+          subject: '',
+          topic: '',
+          subTopic: '',
+          className: '',
+          numberOfQuestions: 5,
+          difficulty: 'medium',
+          questionType: 'mixed'
+        });
+        
+        fetchMaterials(); // Refresh the materials list
+        toast.success(`Generated and created ${createdMaterials.length} questions successfully!`);
+      } else {
+        const error = await response.json();
+        toast.error(error.error || 'Failed to generate questions');
+      }
+    } catch (error) {
+      console.error('Error generating questions:', error);
+      toast.error('Error generating questions');
+    } finally {
+      setAiGenerating(false);
     }
   };
 
@@ -701,6 +778,176 @@ export default function FreeMaterialsPage() {
       <Toaster position="top-right" richColors />
       <ProfessionalAnimatedBackground />
 
+      {/* AI Generation Modal */}
+      {showAIModal && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-800/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/50 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg">
+                    <Brain className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-100">Generate Questions with AI</h3>
+                    <p className="text-slate-400 text-sm">Let AI create MCQ questions for your materials</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowAIModal(false)}
+                  className="p-2 hover:bg-slate-700/50 rounded-lg transition-colors duration-200"
+                >
+                  <X className="w-5 h-5 text-slate-400" />
+                </button>
+              </div>
+
+              {/* AI Form */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                      <BookMarked className="w-4 h-4 text-purple-400" />
+                      Subject <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={aiForm.subject}
+                      onChange={(e) => setAiForm({ ...aiForm, subject: e.target.value })}
+                      className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 placeholder-slate-400 font-medium shadow-lg transition-all duration-200"
+                      placeholder="e.g., Mathematics, Physics, History"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4 text-purple-400" />
+                      Class <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={aiForm.className}
+                      onChange={(e) => setAiForm({ ...aiForm, className: e.target.value })}
+                      className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 placeholder-slate-400 font-medium shadow-lg transition-all duration-200"
+                      placeholder="e.g., Grade 10, Class XII, University"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-200 mb-3">
+                    Topic <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={aiForm.topic}
+                    onChange={(e) => setAiForm({ ...aiForm, topic: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 placeholder-slate-400 font-medium shadow-lg transition-all duration-200"
+                    placeholder="e.g., Quadratic Equations, Photosynthesis, World War II"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-200 mb-3">
+                    Sub Topic (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={aiForm.subTopic}
+                    onChange={(e) => setAiForm({ ...aiForm, subTopic: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 placeholder-slate-400 font-medium shadow-lg transition-all duration-200"
+                    placeholder="e.g., Solving by factorization, Chloroplast structure"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="text-sm font-semibold text-slate-200 mb-3 flex items-center gap-2">
+                      <ListOrdered className="w-4 h-4 text-purple-400" />
+                      Number of Questions
+                    </label>
+                    <select
+                      value={aiForm.numberOfQuestions}
+                      onChange={(e) => setAiForm({ ...aiForm, numberOfQuestions: parseInt(e.target.value) })}
+                      className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 font-medium shadow-lg transition-all duration-200"
+                    >
+                      <option value={3}>3 Questions</option>
+                      <option value={5}>5 Questions</option>
+                      <option value={10}>10 Questions</option>
+                      <option value={15}>15 Questions</option>
+                      <option value={20}>20 Questions</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-200 mb-3">
+                      Difficulty Level
+                    </label>
+                    <select
+                      value={aiForm.difficulty}
+                      onChange={(e) => setAiForm({ ...aiForm, difficulty: e.target.value as 'easy' | 'medium' | 'hard' })}
+                      className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 font-medium shadow-lg transition-all duration-200"
+                    >
+                      <option value="easy">Easy</option>
+                      <option value="medium">Medium</option>
+                      <option value="hard">Hard</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-200 mb-3">
+                      Question Type
+                    </label>
+                    <select
+                      value={aiForm.questionType}
+                      onChange={(e) => setAiForm({ ...aiForm, questionType: e.target.value as 'factual' | 'conceptual' | 'analytical' | 'mixed' })}
+                      className="w-full px-4 py-3 bg-slate-700/50 backdrop-blur-lg border border-slate-600/50 rounded-xl focus:ring-2 focus:ring-purple-500/50 focus:border-purple-400/50 text-slate-100 font-medium shadow-lg transition-all duration-200"
+                    >
+                      <option value="mixed">Mixed</option>
+                      <option value="factual">Factual</option>
+                      <option value="conceptual">Conceptual</option>
+                      <option value="analytical">Analytical</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Modal Actions */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-slate-700/50">
+                  <button
+                    type="button"
+                    onClick={() => setShowAIModal(false)}
+                    className="flex-1 sm:flex-none px-6 py-3 border border-slate-600/50 text-slate-300 font-semibold rounded-xl bg-slate-700/30 hover:bg-slate-700/50 backdrop-blur-lg transition-all duration-200 shadow-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAIGeneration}
+                    disabled={aiGenerating || !aiForm.subject || !aiForm.topic || !aiForm.className}
+                    className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
+                  >
+                    {aiGenerating ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-5 h-5" />
+                        Generate Questions
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -749,7 +996,6 @@ export default function FreeMaterialsPage() {
                 <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-100 to-blue-200 bg-clip-text text-transparent">
                   The Learning Tree
                 </h1>
-
               </div>
             </div>
 
@@ -759,7 +1005,7 @@ export default function FreeMaterialsPage() {
               className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-3 py-2 rounded-lg text-sm transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back to Dashbaord</span>
+              <span className="hidden sm:inline">Back to Dashboard</span>
             </button>
           </div>
         </div>
@@ -902,9 +1148,7 @@ export default function FreeMaterialsPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {['A', 'B', 'C', 'D'].map((option) => (
-                          <div
-
-                            key={option}>
+                          <div key={option}>
                             <label className="block text-sm font-semibold text-slate-200 mb-2">
                               Option {option} <span className="text-red-400">*</span>
                             </label>
@@ -950,9 +1194,7 @@ export default function FreeMaterialsPage() {
                         />
                       </div>
                     </>
-                  )
-
-                  }
+                  )}
 
                   {/* Notes Link Field */}
                   {form.type === 'notes' && (
@@ -1025,6 +1267,13 @@ export default function FreeMaterialsPage() {
                 {!showCreateForm && !editingMaterial && (
                   <div className="flex gap-2">
                     <button
+                      onClick={() => setShowAIModal(true)}
+                      className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Generate with AI
+                    </button>
+                    <button
                       onClick={handleAddQuestion}
                       className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
                     >
@@ -1047,7 +1296,7 @@ export default function FreeMaterialsPage() {
               <div className="text-center py-12 bg-slate-700/30 backdrop-blur-lg rounded-xl border border-slate-600/50">
                 <HelpCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-slate-200 mb-2">No materials found</h3>
-                <p className="text-slate-400 font-medium">Click &quot;Add Question&quot; or &quot;Add Link&quot; to add your first resource.</p>
+                <p className="text-slate-400 font-medium">Click &quot;Generate with AI&quot;, &quot;Add Question&quot; or &quot;Add Link&quot; to add your first resource.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -1149,6 +1398,7 @@ export default function FreeMaterialsPage() {
             Material Guidelines
           </h3>
           <ul className="text-blue-100 text-sm space-y-1 font-medium">
+            <li>• Use AI generation for quick creation of multiple questions</li>
             <li>• Provide clear and relevant topics for materials</li>
             <li>• For MCQs, ensure questions and options are distinct and unambiguous</li>
             <li>• For notes, verify that links are accessible and functional</li>
@@ -1159,9 +1409,13 @@ export default function FreeMaterialsPage() {
       </main>
 
       {/* Loading Overlay */}
-      {(loading || submitting) && (
+      {(loading || submitting || aiGenerating) && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 flex items-center justify-center">
-          <LoadingSpinner message={loading ? "Loading materials..." : "Saving material..."} />
+          <LoadingSpinner message={
+            loading ? "Loading materials..." : 
+            aiGenerating ? "Generating questions with AI..." : 
+            "Saving material..."
+          } />
         </div>
       )}
     </div>
