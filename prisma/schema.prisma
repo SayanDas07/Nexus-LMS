@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String                @id @default(cuid())
+  name                 String
+  email                String                @unique
+  role                 Role
+  school               String?
+  College              String?
+  Specialization       String?
+  phoneNo              String?
+  guardianName         String?
+  guardianPhoneNo      String?
+  teacherCode          String?
+  DOB                  DateTime?
+  clerkId              String                @unique
+  assignmentsCreated   Assignment[]          @relation("AssignmentTeacher")
+  submittedAssignments AssignmentSubmitted[] @relation("SubmittedAssignments")
+
+  createdNotes         Note[]         @relation("NoteCreator")
+  createdNotices       Notice[]       @relation("NoticeCreator")
+  createdClasses       Class[]        @relation("CreatedClasses")
+  enrolledClasses      Class[]        @relation("EnrolledStudents")
+  createdFreeMaterials FreeMaterial[] @relation("FreeMaterialCreator")
+}
+
+model FreeMaterial {
+  id         String   @id @default(cuid())
+  question   String?
+  optionA    String?
+  optionB    String?
+  optionC    String?
+  optionD    String?
+  correctAns String? // Should match one of the options (A, B, C, or D)
+  explanation String?
+  topic      String?
+  notesLink  String?
+  createdBy  String
+  creator    User     @relation("FreeMaterialCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Class {
+  id               String       @id @default(cuid())
+  name             String
+  whichClass       String?
+  inviteCode       String       @unique
+  assignments      Assignment[]
+  notes            Note[]
+  notices          Notice[]
+  teachers         User[]       @relation("CreatedClasses")
+  enrolledStudents User[]       @relation("EnrolledStudents")
+}
+
+model Note {
+  id                  String   @id @default(cuid())
+  noteName            String
+  noteTopic           String
+  notesLinks          String[]
+  whichTeacherCreated String
+  classId             String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  class               Class    @relation(fields: [classId], references: [id])
+  creator             User     @relation("NoteCreator", fields: [whichTeacherCreated], references: [id])
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  classId   String
+  createdBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  class     Class    @relation(fields: [classId], references: [id])
+  creator   User     @relation("NoticeCreator", fields: [createdBy], references: [id])
+}
+
+model Assignment {
+  id                   String                @id @default(cuid())
+  title                String
+  deadline             DateTime
+  classId              String
+  whichTeacher         String
+  totalMarks           Int
+  status               AssignmentStatus
+  type                 AssignmentType // NEW: DRIVE or MCQ
+  driveLink            String? // for DRIVE type
+  mcqQuestions         MCQQuestion[] // for MCQ type
+  assignedStudents     String[]
+  gradedResults        String[]
+  supplementaryFiles   String[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  class                Class                 @relation(fields: [classId], references: [id])
+  teacher              User                  @relation("AssignmentTeacher", fields: [whichTeacher], references: [id])
+  submittedAssignments AssignmentSubmitted[]
+}
+
+model MCQQuestion {
+  id            String     @id @default(cuid())
+  assignmentId  String
+  question      String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctOption String // A, B, C, or D
+  assignment    Assignment @relation(fields: [assignmentId], references: [id])
+}
+
+model AssignmentSubmitted {
+  id              String     @id @default(cuid())
+  assignmentId    String
+  studentId       String
+  submissionLink  String? // for DRIVE type
+  selectedOptions String[] // for MCQ type: array of selected options (A/B/C/D)
+  grade           String?
+  marksObtained   Int?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  assignment      Assignment @relation(fields: [assignmentId], references: [id])
+  student         User       @relation("SubmittedAssignments", fields: [studentId], references: [id])
+
+  @@unique([assignmentId, studentId])
+}
+
+enum AssignmentStatus {
+  OPEN
+  CLOSED
+}
+
+enum AssignmentType {
+  DRIVE
+  MCQ
+}
+
+enum Role {
+  student
+  teacher
+}
