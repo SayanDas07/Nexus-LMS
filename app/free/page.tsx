@@ -433,7 +433,7 @@ const LoadingSpinner = ({ message = "Loading..." }) => (
 )
 
 interface Question {
-    id: number;
+    id: string;
     question: string;
     options: string[];
     correctAnswer: number;
@@ -465,7 +465,7 @@ export default function MCQTestPage() {
     const [currentView, setCurrentView] = useState<"mcq" | "notes">("mcq");
     const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number }>({});
+    const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: number }>({});
     const [showResults, setShowResults] = useState(false);
     const [testSubmitted, setTestSubmitted] = useState(false);
     const [expandedTopics, setExpandedTopics] = useState<{ [key: string]: boolean }>({});
@@ -497,11 +497,12 @@ export default function MCQTestPage() {
 
     const groupedMCQs = freeMaterials
         .filter((material) => material.question && material.optionA && material.optionB && material.optionC && material.optionD)
-        .reduce((acc, material) => {
+        .reduce((acc, material, index) => {
             const topic = material.topic;
             if (!acc[topic]) acc[topic] = [];
             acc[topic].push({
-                id: parseInt(material.id.slice(-8), 16) || parseInt(material.id),
+                // Use a combination of topic and index to ensure unique IDs
+                id: `${topic}_${index}_${material.id}`,
                 question: material.question!,
                 options: [material.optionA!, material.optionB!, material.optionC!, material.optionD!],
                 correctAnswer: material.correctAns === "A" ? 0 : material.correctAns === "B" ? 1 : material.correctAns === "C" ? 2 : 3,
@@ -525,9 +526,17 @@ export default function MCQTestPage() {
 
     const getCurrentTopicQuestions = () => (selectedTopic ? groupedMCQs[selectedTopic] || [] : []);
 
-    const handleAnswerSelect = (questionId: number, answerIndex: number) => {
+    const handleAnswerSelect = (questionId: string, answerIndex: number) => {
         if (testSubmitted) return;
-        setSelectedAnswers((prev) => ({ ...prev, [questionId]: answerIndex }));
+
+        console.log('Selecting answer:', questionId, answerIndex); // Debug log
+
+        setSelectedAnswers((prev) => {
+            const newAnswers = { ...prev };
+            newAnswers[questionId] = answerIndex;
+            console.log('Updated answers:', newAnswers); // Debug log
+            return newAnswers;
+        });
     };
 
     const handleSubmitTest = () => {
@@ -604,7 +613,7 @@ export default function MCQTestPage() {
                                 <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-100 to-blue-200 bg-clip-text text-transparent">
                                     Nexus LMS
                                 </h1>
-                        
+
                             </div>
                         </div>
 
@@ -722,7 +731,7 @@ export default function MCQTestPage() {
                                                         const showIncorrect = testSubmitted && isSelected && !isCorrect;
                                                         return (
                                                             <button
-                                                                key={optionIndex}
+                                                                key={`${question.id}_${optionIndex}`}
                                                                 onClick={() => handleAnswerSelect(question.id, optionIndex)}
                                                                 disabled={testSubmitted}
                                                                 className={`p-3 text-left rounded-lg border transition-all duration-200 ${showCorrect
