@@ -153,7 +153,8 @@ To run Nexus LMS locally, follow these steps:
 ## Database Schema
 
 The platform uses a robust relational database structure:
-![image](https://github.com/user-attachments/assets/1f789369-c281-4174-b509-39cf5f18e2c8)
+<img width="1664" height="3708" alt="image" src="https://github.com/user-attachments/assets/5d082967-c36c-4972-8cc2-0c0639cf11f3" />
+
 
 ## Security Features
 
