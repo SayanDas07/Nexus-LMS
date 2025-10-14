@@ -1,4 +1,4 @@
-# Nexus LMS
+# Nexus-LMS
 
 A modern full-stack Learning Management System that bridges the gap between educators and students with intelligent features, seamless classroom management, and an engaging learning experience.
 
@@ -105,13 +105,13 @@ To run Nexus LMS locally, follow these steps:
 4. **Set up environment variables:**
    Create a `.env.local` file in the root directory and add this variables:
    ```env
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-   CLERK_SECRET_KEY=
-   ADMIN_EMAIL=
-   ADMIN_EMAIL_PASSWORD=
-   DATABASE_URL=
-   GEMINI_API_KEY=
-
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY= comes from your own cleck project
+   CLERK_SECRET_KEY= comes from your own cleck project
+   ADMIN_EMAIL= yourprimarymail@gmail.com
+   ADMIN_EMAIL_PASSWORD= apppassword
+   DATABASE_URL= connect your db 
+   GEMINI_API_KEY= gemini api key from email-1
+   GEMINI_API_KEY_2= gemini api key from email-2
    ```
 
 5. **Set up the database:**
